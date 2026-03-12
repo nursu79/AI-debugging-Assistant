@@ -61,8 +61,8 @@ class TestFullPipeline:
         # Verify steps were executed correctly
         assert result["error_explanation"] == MOCK_ANALYSIS["error_explanation"]
         assert result["root_cause"] == MOCK_ANALYSIS["root_cause"]
-        assert result["_meta"]["error_type"] == "ZeroDivisionError"
-        assert result["_meta"]["line"] == 4  # File "calculator.py", line 4
+        assert result["metadata"]["error_type"] == "ZeroDivisionError"
+        assert result["metadata"]["line"] == 4  # File "calculator.py", line 4
 
     @patch("src.debug_assistant.is_ollama_running", return_value=True)
     @patch("src.debug_assistant.analyze_error")
@@ -85,7 +85,7 @@ class TestFullPipeline:
             file_path=str(f)
         )
 
-        assert result["_meta"]["file"] == str(f)
+        assert result["metadata"]["file"] == str(f)
         assert result["suggested_fix"] == MOCK_ANALYSIS["suggested_fix"]
 
     def test_pipeline_missing_source_raises(self):

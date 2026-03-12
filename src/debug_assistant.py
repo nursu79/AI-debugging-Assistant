@@ -71,7 +71,7 @@ def run_debug_pipeline(
 
     # ── Step 5: Return structured result ────────────────────────────────────
     result = analysis.to_dict()
-    result["_meta"] = {
+    result["metadata"] = {
         "error_type": error_meta.error_type,
         "file": error_meta.file,
         "line": error_meta.line,
@@ -134,8 +134,7 @@ def _pretty_print(result: dict) -> None:
     print("  AI DEBUGGING ASSISTANT — ANALYSIS REPORT")
     print(f"{'═' * 60}")
 
-    if meta.get("error_type"):
-        print(f"\n► Error Type : {meta['error_type']}")
+    print(f"\n► Error Type : {meta.get('error_type', 'Unknown')}")
     if meta.get("file"):
         print(f"► File       : {meta['file']}  (line {meta.get('line', '?')})")
     print(f"► Model      : {meta.get('model', 'unknown')}  "
@@ -188,8 +187,8 @@ def main(argv=None) -> int:
         return 1
 
     if args.json_only:
-        # Remove internal meta key for clean machine output
-        out = {k: v for k, v in result.items() if k != "_meta"}
+        # Remove internal metadata key for clean machine output
+        out = {k: v for k, v in result.items() if k != "metadata"}
         print(json.dumps(out, indent=2))
     else:
         _pretty_print(result)

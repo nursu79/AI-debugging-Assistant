@@ -2,63 +2,62 @@
 
 An AI-powered debugging assistant that helps developers understand and fix runtime errors using open-source LLMs via Ollama.
 
-## Features
+## 🚀 Features
 
-- **Structured Error Parsing** — Extracts `error_type`, `file`, `line`, and `message` from stack traces
-- **Code Context Retrieval** — Fetches relevant lines around the error location
-- **Intelligent Prompt Construction** — Builds structured prompts optimized for debugging tasks
-- **LLM-Powered Analysis** — Integrates with Ollama (DeepSeek-Coder / CodeLlama)
-- **Structured Output** — Returns validated JSON with explanation, root cause, fix, and corrected code
-- **FastAPI Interface** — REST endpoint at `POST /debug`
+- **Structured Error Parsing** — Extracts `error_type`, `file`, `line`, and `message` from Python stack traces.
+- **Code Context Retrieval** — Fetches a configurable window of lines around the error location (default +/- 5 lines).
+- **Intelligent Prompt Construction** — Builds structured prompts with annotated code snippets (marks error lines with `>>>`).
+- **LLM-Powered Analysis** — Integrates with Ollama (DeepSeek-Coder / CodeLlama).
+- **Structured Output** — Returns validated JSON with explanation, root cause, fix, and corrected code.
+- **Multi-Strategy Parsing** — Handles raw JSON, markdown blocks, or text fallbacks to ensure valid results.
+- **FastAPI Interface** — REST endpoint at `POST /debug`.
+- **CLI Interface** — Direct analysis from the terminal.
 
-## Architecture
+## 🏗 Architecture
 
-```
-User Input (error + code)
-        │
-        ▼
-  Error Parser          ← parser.py
-        │
-        ▼
-Code Context Retriever  ← retriever.py
-        │
-        ▼
-  Prompt Builder        ← prompt_builder.py
-        │
-        ▼
-   LLM Engine           ← llm_engine.py (Ollama)
-        │
-        ▼
-Structured Response     ← debug_assistant.py
-        │
-        ▼
-  FastAPI API           ← api.py
+```mermaid
+graph TD
+    Input[User Input: Error + Code] --> Parser[Error Parser]
+    Parser --> Retriever[Code Context Retriever]
+    Retriever --> Builder[Prompt Builder]
+    Builder --> Engine[LLM Engine: Ollama]
+    Engine --> Pipeline[Structured Response]
+    Pipeline --> API[FastAPI / CLI]
 ```
 
-## Prerequisites
+## 🛠 Prerequisites
 
 - Python 3.10+
-- [Ollama](https://ollama.ai) installed and running
-- A code model pulled: `ollama pull deepseek-coder` or `ollama pull codellama`
+- [Ollama](https://ollama.ai) installed and running.
+- A code model pulled:
+  ```bash
+  ollama pull deepseek-coder
+  ```
 
-## Setup
+## 📦 Setup
 
 ```bash
+# Clone the repository
+git clone https://github.com/nursu79/AI-debugging-Assistant.git
+cd AI-debugging-Assistant
+
 # Create virtual environment
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-## Running the API
+## 🚦 Usage
+
+### Running the API
 
 ```bash
 uvicorn src.api:app --reload --port 8000
 ```
 
-## API Usage
+### API Usage Example
 
 ```bash
 curl -X POST http://localhost:8000/debug \
@@ -69,58 +68,23 @@ curl -X POST http://localhost:8000/debug \
   }'
 ```
 
-## Running Tests
+### CLI Usage
+
+```bash
+python3 -m src.debug_assistant --error "IndexError: list index out of range\nFile \"app.py\", line 5" --code "l = [1, 2]\nprint(l[10])"
+```
+
+## 🧪 Testing
+
+The project includes a comprehensive suite of **92 unit and integration tests** covering all modules.
 
 ```bash
 pytest tests/ -v
 ```
 
-## CLI Usage
+## 📘 Design Decisions
 
-```bash
-python -m src.debug_assistant \
-  --error "TypeError: unsupported operand type(s) for +: '\''int'\'' and '\''str'\''\nFile \"main.py\", line 10" \
-  --file examples/sample_code.py
-```
-
-## Project Structure
-
-```
-ai-debug-assistant/
-├── README.md
-├── DESIGN_DECISIONS.md
-├── requirements.txt
-├── src/
-│   ├── parser.py
-│   ├── retriever.py
-│   ├── prompt_builder.py
-│   ├── llm_engine.py
-│   ├── debug_assistant.py
-│   └── api.py
-├── tests/
-│   ├── test_parser.py
-│   ├── test_retriever.py
-│   └── test_pipeline.py
-└── examples/
-    ├── sample_errors.txt
-    └── sample_code.py
-```
-
-## Output Format
-
-```json
-{
-  "error_explanation": "This error occurs when...",
-  "root_cause": "The variable x is of type int but...",
-  "suggested_fix": "Convert the string to int before adding...",
-  "corrected_code": "result = 5 + int('hello')"
-}
-```
-
-## Model Options
-
-| Model | Command |
-|-------|---------|
-| DeepSeek-Coder (recommended) | `ollama pull deepseek-coder` |
-| CodeLlama | `ollama pull codellama` |
-| StarCoder2 | `ollama pull starcoder2` |
+See [DESIGN_DECISIONS.md](./DESIGN_DECISIONS.md) for detailed information on:
+- Why we chose DeepSeek-Coder.
+- How we mitigate LLM hallucinations.
+- The benefit of structured prompt engineering.

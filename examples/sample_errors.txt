@@ -1,0 +1,25 @@
+# Sample Python Error Cases for Testing
+
+1. TypeError: unsupported operand type(s) for +: 'int' and 'str'
+Traceback (most recent call last):
+  File "examples/sample_code.py", line 10, in <module>
+    result = count + " items"
+TypeError: unsupported operand type(s) for +: 'int' and 'str'
+
+2. IndexError: list index out of range
+Traceback (most recent call last):
+  File "examples/sample_code.py", line 15, in process_list
+    return items[10]
+IndexError: list index out of range
+
+3. KeyError: 'database'
+Traceback (most recent call last):
+  File "examples/sample_code.py", line 20, in load_config
+    db_config = config['database']
+KeyError: 'database'
+
+4. AttributeError: 'NoneType' object has no attribute 'get'
+Traceback (most recent call last):
+  File "examples/sample_code.py", line 25, in fetch_data
+    response = service.get(id)
+AttributeError: 'NoneType' object has no attribute 'get'

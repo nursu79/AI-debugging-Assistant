@@ -85,6 +85,6 @@ pytest tests/ -v
 ## 📘 Design Decisions
 
 See [DESIGN_DECISIONS.md](./DESIGN_DECISIONS.md) for detailed information on:
-- Why we chose DeepSeek-Coder.
-- How we mitigate LLM hallucinations.
+- Why I chose DeepSeek-Coder.
+- How I mitigate LLM hallucinations.
 - The benefit of structured prompt engineering.

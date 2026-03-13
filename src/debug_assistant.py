@@ -127,7 +127,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 
 def _pretty_print(result: dict) -> None:
     """Print a human-readable debugging report."""
-    meta = result.get("_meta", {})
+    meta = result.get("metadata", {})
     sep = "─" * 60
 
     print(f"\n{'═' * 60}")
@@ -175,8 +175,11 @@ def main(argv=None) -> int:
         return 1
 
     try:
+        # Handle literal \n if passed from shell
+        error_msg = args.error.replace("\\n", "\n")
+        
         result = run_debug_pipeline(
-            error_message=args.error,
+            error_message=error_msg,
             code=args.code,
             file_path=args.file,
             model=args.model,

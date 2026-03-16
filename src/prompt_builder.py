@@ -12,6 +12,9 @@ The prompt is designed to:
 from src.parser import ErrorMetadata
 from src.retriever import CodeContext
 
+# Make sure not to cause circular dependency, so we only import for type hints if needed, 
+# but here we can just use typing.Any for DebugContext if needed, or import from inside the function.
+
 
 SYSTEM_INSTRUCTION = """\
 You are an expert software debugging assistant specializing in Python runtime errors.
@@ -114,3 +117,51 @@ def build_prompt_from_raw(
         line_number=error_metadata.line,
     )
     return build_prompt(error_metadata, code_context)
+
+
+def build_follow_up_prompt(context: "DebugContext", question: str) -> str:
+    """
+    Build a conversational prompt for follow-up debugging questions.
+
+    Args:
+        context:  The current DebugContext object holding the state.
+        question: The user's new question.
+
+    Returns:
+        Structured prompt containing error summary, code snippet, initial analysis, and chat history.
+    """
+    sections = []
+
+    sections.append("You are an AI debugging assistant. Answer clearly and concisely.")
+    sections.append("")
+    
+    sections.append("## ERROR INFORMATION")
+    sections.append(f"Type: {context.error_type}")
+    sections.append(f"Message: {context.error_message}")
+    sections.append("")
+    
+    sections.append("## CODE CONTEXT")
+    sections.append("```python")
+    sections.append(context.code_context)
+    sections.append("```")
+    sections.append("")
+    
+    sections.append("## INITIAL ANALYSIS")
+    sections.append(f"Explanation: {context.initial_analysis.error_explanation}")
+    sections.append(f"Root Cause: {context.initial_analysis.root_cause}")
+    sections.append(f"Suggested Fix: {context.initial_analysis.suggested_fix}")
+    sections.append("")
+    
+    if context.history:
+        sections.append("## CONVERSATION HISTORY")
+        for role, text in context.history:
+            role_name = "User" if role == "user" else "Assistant"
+            sections.append(f"{role_name}: {text}")
+        sections.append("")
+
+    sections.append("The user is asking a follow-up question about this error.")
+    sections.append("")
+    sections.append("User Question:")
+    sections.append(question)
+
+    return "\n".join(sections)

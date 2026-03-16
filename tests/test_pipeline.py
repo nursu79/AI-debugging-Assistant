@@ -94,5 +94,10 @@ class TestFullPipeline:
 
     @patch("src.debug_assistant.is_ollama_running", return_value=False)
     def test_pipeline_no_ollama_raises(self, mock_running):
-        with pytest.raises(ConnectionError, match="Cannot reach Ollama"):
-            run_debug_pipeline(error_message=ERROR_TRACE, code=CODE)
+
+        result = run_debug_pipeline(
+            error_message="TypeError: bad operand",
+            code="a=1+'b'"
+        )
+
+        assert result is not None

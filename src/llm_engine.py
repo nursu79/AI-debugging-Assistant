@@ -92,6 +92,26 @@ def analyze_error(
     return analysis
 
 
+def generate_followup(
+    prompt: str,
+    model: str = DEFAULT_MODEL,
+    base_url: str = OLLAMA_BASE_URL,
+) -> str:
+    """
+    Send a follow-up conversational prompt to Ollama and return raw text.
+
+    Args:
+        prompt:   Fully constructed follow-up prompt.
+        model:    Ollama model name.
+        base_url: Ollama server URL.
+
+    Returns:
+        The raw string answer from the LLM.
+    """
+    _check_ollama_available(base_url)
+    return _call_ollama(prompt, model, base_url).strip()
+
+
 def list_available_models(base_url: str = OLLAMA_BASE_URL) -> list[str]:
     """Return names of models currently installed in Ollama."""
     try:

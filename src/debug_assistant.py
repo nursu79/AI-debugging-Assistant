@@ -18,6 +18,7 @@ from src.parser import parse_error, ErrorMetadata
 from src.retriever import get_context, CodeContext
 from src.prompt_builder import build_prompt
 from src.llm_engine import analyze_error, DebugAnalysis, is_ollama_running
+from src.interactive_session import DebugContext, start_interactive_session
 
 
 # ---------------------------------------------------------------------------
@@ -122,6 +123,11 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Output raw JSON only (machine-readable)",
     )
+    parser.add_argument(
+        "--interactive", "-i",
+        action="store_true",
+        help="Start an interactive chat session after the initial analysis",
+    )
     return parser
 
 
@@ -195,6 +201,29 @@ def main(argv=None) -> int:
         print(json.dumps(out, indent=2))
     else:
         _pretty_print(result)
+
+    if args.interactive and not args.json_only:
+        # Reconstruct DebugAnalysis and context for the interactive session
+        analysis = DebugAnalysis(
+            error_explanation=result["error_explanation"],
+            root_cause=result["root_cause"],
+            suggested_fix=result["suggested_fix"],
+            corrected_code=result["corrected_code"],
+            model=result["metadata"]["model"],
+            parse_source=result["metadata"]["parse_source"],
+        )
+        # Recreate code block assuming it matched context originally
+        context = DebugContext(
+            error_type=result["metadata"]["error_type"],
+            error_message=args.error.replace("\\n", "\n"),
+            file=result["metadata"]["file"],
+            line=result["metadata"]["line"],
+            code_context=result.get("corrected_code", "Context unavailable"),
+            initial_analysis=analysis,
+        )
+        
+        # Start the loop
+        start_interactive_session(context, model=args.model)
 
     return 0
 

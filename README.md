@@ -74,6 +74,22 @@ curl -X POST http://localhost:8000/debug \
 python3 -m src.debug_assistant --error "IndexError: list index out of range\nFile \"app.py\", line 5" --code "l = [1, 2]\nprint(l[10])"
 ```
 
+### Interactive Debug Mode
+
+The assistant supports interactive follow-up conversations about an error without rerunning the entire analysis pipeline.
+
+```bash
+python3 -m src.debug_assistant --interactive \
+  --error "IndexError: list index out of range\nFile \"app.py\", line 5" \
+  --code "l=[1,2]\nprint(l[10])"
+```
+
+Once the initial analysis is generated, you will enter a CLI prompt (`>`) where you can ask contextual questions like:
+- *"Why did this happen?"*
+- *"What is a safer way to express this?"*
+
+Type `exit` or `quit` to end the session.
+
 ## 🧪 Testing
 
 The project includes a comprehensive suite of **92 unit and integration tests** covering all modules.
